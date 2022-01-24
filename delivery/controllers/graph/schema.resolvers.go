@@ -5,7 +5,7 @@ package graph
 
 import (
 	"Project/research/sample-gql/entities"
-	entities1 "Project/research/sample-gql/entities/model"
+	"Project/research/sample-gql/entities/model"
 	"Project/research/sample-gql/util/graph/generated"
 	"context"
 	"errors"
@@ -13,7 +13,7 @@ import (
 	"strconv"
 )
 
-func (r *mutationResolver) AddPerson(ctx context.Context, input entities1.NewPerson) (*entities1.Person, error) {
+func (r *mutationResolver) AddPerson(ctx context.Context, input model.NewPerson) (*model.Person, error) {
 	res, err := r.personRepo.Create(entities.Person{Nama: input.Nama, HP: *input.Hp, Umur: input.Umur, Password: input.Password})
 
 	if err != nil {
@@ -30,10 +30,10 @@ func (r *mutationResolver) AddPerson(ctx context.Context, input entities1.NewPer
 
 	// r.mu.Unlock()
 
-	return &entities1.Person{ID: strconv.Itoa(int(res.ID)), Nama: res.Nama, Hp: &res.HP, Umur: res.Umur}, nil
+	return &model.Person{ID: strconv.Itoa(int(res.ID)), Nama: res.Nama, Hp: &res.HP, Umur: res.Umur}, nil
 }
 
-func (r *mutationResolver) AddBook(ctx context.Context, input entities1.NewBook) (*entities1.Book, error) {
+func (r *mutationResolver) AddBook(ctx context.Context, input model.NewBook) (*model.Book, error) {
 	res, err := r.bookRepo.Create(entities.Book{Title: input.Title, Author: uint(input.Author)})
 
 	if err != nil {
@@ -41,7 +41,7 @@ func (r *mutationResolver) AddBook(ctx context.Context, input entities1.NewBook)
 	}
 	convID := int(res.ID)
 
-	return &entities1.Book{ID: &convID, Title: res.Title}, nil
+	return &model.Book{ID: &convID, Title: res.Title}, nil
 	// return &res, nil
 
 	// panic(fmt.Errorf("not implemented"))
@@ -49,13 +49,13 @@ func (r *mutationResolver) AddBook(ctx context.Context, input entities1.NewBook)
 	// res, err := repo.Create(entities.Book{Title: input.Title, Author: })
 }
 
-func (r *queryResolver) Books(ctx context.Context) ([]*entities1.Book, error) {
+func (r *queryResolver) Books(ctx context.Context) ([]*model.Book, error) {
 	res, err := r.bookRepo.Get()
 
 	preload := GetPreloads(ctx)
 	fmt.Println(preload)
 
-	pointRes := []*entities1.Book{}
+	pointRes := []*model.Book{}
 	// pointRes := []*entities.Book{}
 
 	// for _, v := range res {
@@ -64,7 +64,7 @@ func (r *queryResolver) Books(ctx context.Context) ([]*entities1.Book, error) {
 
 	for i := 0; i < len(res); i++ {
 		convID := int(res[i].ID)
-		pointRes = append(pointRes, &entities1.Book{ID: &convID, Title: res[i].Title})
+		pointRes = append(pointRes, &model.Book{ID: &convID, Title: res[i].Title})
 	}
 
 	// for i := 0; i < len(res); i++ {
@@ -79,15 +79,15 @@ func (r *queryResolver) Books(ctx context.Context) ([]*entities1.Book, error) {
 	return pointRes, nil
 }
 
-func (r *queryResolver) Persons(ctx context.Context) ([]*entities1.Person, error) {
+func (r *queryResolver) Persons(ctx context.Context) ([]*model.Person, error) {
 	res, err := r.personRepo.Get()
 
 	if err != nil {
 		return nil, errors.New("not found")
 	}
-	resArr := []*entities1.Person{}
+	resArr := []*model.Person{}
 	for i := 0; i < len(res); i++ {
-		resArr = append(resArr, &entities1.Person{ID: strconv.Itoa(int(res[i].ID)), Nama: res[i].Nama, Umur: res[i].Umur, Hp: &res[i].HP})
+		resArr = append(resArr, &model.Person{ID: strconv.Itoa(int(res[i].ID)), Nama: res[i].Nama, Umur: res[i].Umur, Hp: &res[i].HP})
 	}
 
 	return resArr, err
