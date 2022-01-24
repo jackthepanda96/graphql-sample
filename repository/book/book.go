@@ -2,7 +2,7 @@ package book
 
 import (
 	"Project/research/sample-gql/entities"
-	"fmt"
+	"Project/research/sample-gql/entities/model"
 
 	"gorm.io/gorm"
 )
@@ -17,17 +17,15 @@ func New(db *gorm.DB) *BookRepository {
 
 func (br *BookRepository) Get() ([]entities.Book, error) {
 	var books []entities.Book
-	var tmp []entities.Person
-	qry := br.db.Raw("Select * from books join people on people.ID = books.author").Scan(&books)
+
+	qry := br.db.Find(&books)
+	// br.db.Raw("Select * from books join people on people.ID = books.author").Scan(&books)
 	// br.db.Joins("Persons").Find(&books)
 
 	if err := qry.Error; err != nil {
 		return nil, err
 	}
 
-	fmt.Println(qry.Statement)
-	fmt.Println(qry.Statement.Preloads["Books"]...)
-	fmt.Println(tmp)
 	return books, nil
 }
 
@@ -36,4 +34,34 @@ func (br *BookRepository) Create(book entities.Book) (entities.Book, error) {
 		return book, err
 	}
 	return book, nil
+}
+
+func (br *BookRepository) GraphGet() ([]*model.Book, error) {
+	type res struct {
+		BookID   int
+		Title    string
+		PersonID string
+		Nama     string
+		Hp       string
+		Umur     int
+		Password string
+	}
+	var tmp []res
+	qry := br.db.Raw("Select * from books join people on people.ID = books.author").Scan(&tmp)
+	// br.db.Find(&tmp)
+	if err := qry.Error; err != nil {
+		return nil, err
+	}
+	resArr := []*model.Book{}
+	for i := 0; i < len(tmp); i++ {
+		resArr = append(resArr, &model.Book{ID: &tmp[i].BookID,
+			Title: tmp[i].Title,
+			Author: &model.Person{
+				ID:   tmp[i].PersonID,
+				Nama: tmp[i].Nama,
+				Hp:   &tmp[i].Hp,
+				Umur: tmp[i].Umur}})
+	}
+
+	return resArr, nil
 }

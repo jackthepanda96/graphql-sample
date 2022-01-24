@@ -4,6 +4,7 @@ import (
 	"Project/research/sample-gql/delivery/controllers/auth"
 	"Project/research/sample-gql/delivery/controllers/book"
 	"Project/research/sample-gql/delivery/controllers/person"
+	custom "Project/research/sample-gql/delivery/middleware"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
@@ -16,8 +17,8 @@ func RegisterPath(e *echo.Echo, authController *auth.AuthController, personContr
 	// e.Use(middleware.Logger())
 	// Login
 	e.POST("/login", authController.Login())
-	e.POST("/persons", personController.Create())
-	e.GET("/persons", personController.Get())
+	e.POST("/persons", personController.Create(), custom.JWTMiddleware())
+	e.GET("/persons", personController.Get(), custom.JWTMiddleware())
 	e.POST("/books", bookController.Create())
 	e.GET("/books", bookController.Get())
 	{

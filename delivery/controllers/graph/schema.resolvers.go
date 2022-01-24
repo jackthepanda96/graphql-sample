@@ -9,7 +9,6 @@ import (
 	"Project/research/sample-gql/util/graph/generated"
 	"context"
 	"errors"
-	"fmt"
 	"strconv"
 )
 
@@ -19,16 +18,6 @@ func (r *mutationResolver) AddPerson(ctx context.Context, input model.NewPerson)
 	if err != nil {
 		return nil, errors.New("not found")
 	}
-
-	// r.tmpList = append(r.tmpList, &model.Person{ID: strconv.Itoa(int(res.ID)), Nama: res.Nama, Hp: &res.HP, Umur: res.Umur})
-
-	// r.mu.Lock()
-
-	// for _, osv := range r.Observer {
-	// 	osv <- &entities1.Person{ID: strconv.Itoa(int(res.ID)), Nama: res.Nama, Hp: &res.HP, Umur: res.Umur}
-	// }
-
-	// r.mu.Unlock()
 
 	return &model.Person{ID: strconv.Itoa(int(res.ID)), Nama: res.Nama, Hp: &res.HP, Umur: res.Umur}, nil
 }
@@ -42,44 +31,21 @@ func (r *mutationResolver) AddBook(ctx context.Context, input model.NewBook) (*m
 	convID := int(res.ID)
 
 	return &model.Book{ID: &convID, Title: res.Title}, nil
-	// return &res, nil
-
-	// panic(fmt.Errorf("not implemented"))
-
-	// res, err := repo.Create(entities.Book{Title: input.Title, Author: })
 }
 
 func (r *queryResolver) Books(ctx context.Context) ([]*model.Book, error) {
-	res, err := r.bookRepo.Get()
-
-	preload := GetPreloads(ctx)
-	fmt.Println(preload)
-
-	pointRes := []*model.Book{}
-	// pointRes := []*entities.Book{}
-
-	// for _, v := range res {
-	// 	pointRes = append(pointRes, &model.Book{Title: v.Title})
-	// }
-
-	for i := 0; i < len(res); i++ {
-		convID := int(res[i].ID)
-		pointRes = append(pointRes, &model.Book{ID: &convID, Title: res[i].Title})
-	}
-
-	// for i := 0; i < len(res); i++ {
-	// 	// convID := int(res[i].ID)
-	// 	pointRes = append(pointRes, &res[i])
-	// }
+	res2, err := r.bookRepo.GraphGet()
 
 	if err != nil {
 		return nil, errors.New("not found")
 	}
 
-	return pointRes, nil
+	return res2, nil
 }
 
 func (r *queryResolver) Persons(ctx context.Context) ([]*model.Person, error) {
+	// middleware.GetAuthFromContext(ctx)
+
 	res, err := r.personRepo.Get()
 
 	if err != nil {
