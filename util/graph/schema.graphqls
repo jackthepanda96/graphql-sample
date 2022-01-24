@@ -1,0 +1,63 @@
+type Book{
+  id: Int
+  title: String!
+  author: Person!
+}
+
+type Person{
+  id: ID!
+  nama: String!
+  hp: String
+  umur: Int!
+  password: String!
+}
+
+type Query{
+  books: [Book!]!
+  persons: [Person!]!
+}
+
+input NewPerson{
+  nama: String!
+  hp: String
+  umur: Int!
+  password: String!
+}
+
+input NewBook{
+  title: String!
+  author: Int!
+}
+
+type Mutation{
+  addPerson(input: NewPerson!):Person!
+  addBook(input: NewBook!):Book!
+}
+
+# type Subscription{
+#   resigteredUser: Person!
+# }
+# type Todo {
+#   id: ID!
+#   text: String!
+#   done: Boolean!
+#   user: User!
+# }
+
+# type User {
+#   id: ID!
+#   name: String!
+# }
+
+# type Query {
+#   todos: [Todo!]!
+# }
+
+# input NewTodo {
+#   text: String!
+#   userId: String!
+# }
+
+# type Mutation {
+#   createTodo(input: NewTodo!): Todo!
+# }
