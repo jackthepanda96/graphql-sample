@@ -43,6 +43,16 @@ func (r *queryResolver) Books(ctx context.Context) ([]*model.Book, error) {
 	return res2, nil
 }
 
+func (r *queryResolver) BooksByID(ctx context.Context, id int) (*model.Book, error) {
+	res, err := r.bookRepo.GraphGetByID(id)
+
+	if err != nil {
+		return nil, errors.New("not found")
+	}
+
+	return res, nil
+}
+
 func (r *queryResolver) Persons(ctx context.Context) ([]*model.Person, error) {
 	// middleware.GetAuthFromContext(ctx)
 

@@ -9,4 +9,5 @@ type Book interface {
 	Get() ([]entities.Book, error)
 	Create(entities.Book) (entities.Book, error)
 	GraphGet() ([]*model.Book, error)
+	GraphGetByID(id int) (*model.Book, error)
 }

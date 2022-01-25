@@ -3,6 +3,7 @@ package book
 import (
 	"Project/research/sample-gql/entities"
 	"Project/research/sample-gql/entities/model"
+	"strconv"
 
 	"gorm.io/gorm"
 )
@@ -64,4 +65,30 @@ func (br *BookRepository) GraphGet() ([]*model.Book, error) {
 	}
 
 	return resArr, nil
+}
+
+func (br *BookRepository) GraphGetByID(id int) (*model.Book, error) {
+	type res struct {
+		ID       int
+		Title    string
+		PersonID int
+		Nama     string
+		Hp       string
+		Umur     int
+		Password string
+	}
+	var tmp res
+	qry := br.db.Raw(`Select books.ID, books.Title, people.ID as 'PersonID', people.nama, people.hp, people.umur from books join people on people.ID = books.author where books.ID = ?`, id).Scan(&tmp)
+
+	if err := qry.Error; err != nil {
+		return nil, err
+	}
+
+	return &model.Book{ID: &tmp.ID,
+		Title: tmp.Title,
+		Author: &model.Person{
+			ID:   strconv.Itoa(tmp.PersonID),
+			Nama: tmp.Nama,
+			Hp:   &tmp.Hp,
+			Umur: tmp.Umur}}, nil
 }

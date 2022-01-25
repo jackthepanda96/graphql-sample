@@ -63,8 +63,9 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Books   func(childComplexity int) int
-		Persons func(childComplexity int) int
+		Books     func(childComplexity int) int
+		BooksByID func(childComplexity int, id int) int
+		Persons   func(childComplexity int) int
 	}
 }
 
@@ -74,6 +75,7 @@ type MutationResolver interface {
 }
 type QueryResolver interface {
 	Books(ctx context.Context) ([]*model.Book, error)
+	BooksByID(ctx context.Context, id int) (*model.Book, error)
 	Persons(ctx context.Context) ([]*model.Person, error)
 }
 
@@ -179,6 +181,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Books(childComplexity), true
 
+	case "Query.booksByID":
+		if e.complexity.Query.BooksByID == nil {
+			break
+		}
+
+		args, err := ec.field_Query_booksByID_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.BooksByID(childComplexity, args["id"].(int)), true
+
 	case "Query.persons":
 		if e.complexity.Query.Persons == nil {
 			break
@@ -266,6 +280,7 @@ type Person{
 
 type Query{
   books: [Book!]!
+  booksByID(id: Int!): Book
   persons: [Person!]!
 }
 
@@ -363,6 +378,21 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 		}
 	}
 	args["name"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_booksByID_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
 	return args, nil
 }
 
@@ -795,6 +825,45 @@ func (ec *executionContext) _Query_books(ctx context.Context, field graphql.Coll
 	res := resTmp.([]*model.Book)
 	fc.Result = res
 	return ec.marshalNBook2ᚕᚖProjectᚋresearchᚋsampleᚑgqlᚋentitiesᚋmodelᚐBookᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_booksByID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_booksByID_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().BooksByID(rctx, args["id"].(int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.Book)
+	fc.Result = res
+	return ec.marshalOBook2ᚖProjectᚋresearchᚋsampleᚑgqlᚋentitiesᚋmodelᚐBook(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_persons(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2254,6 +2323,17 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}
 				return res
 			})
+		case "booksByID":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_booksByID(ctx, field)
+				return res
+			})
 		case "persons":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
@@ -2974,6 +3054,13 @@ func (ec *executionContext) marshalN__TypeKind2string(ctx context.Context, sel a
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) marshalOBook2ᚖProjectᚋresearchᚋsampleᚑgqlᚋentitiesᚋmodelᚐBook(ctx context.Context, sel ast.SelectionSet, v *model.Book) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Book(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOBoolean2bool(ctx context.Context, v interface{}) (bool, error) {
