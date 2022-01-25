@@ -55,10 +55,11 @@ func (br *BookRepository) GraphGet() ([]*model.Book, error) {
 	}
 	resArr := []*model.Book{}
 	for i := 0; i < len(tmp); i++ {
+		convID, _ := strconv.Atoi(tmp[i].PersonID)
 		resArr = append(resArr, &model.Book{ID: &tmp[i].BookID,
 			Title: tmp[i].Title,
 			Author: &model.Person{
-				ID:   tmp[i].PersonID,
+				ID:   convID,
 				Nama: tmp[i].Nama,
 				Hp:   &tmp[i].Hp,
 				Umur: tmp[i].Umur}})
@@ -87,7 +88,7 @@ func (br *BookRepository) GraphGetByID(id int) (*model.Book, error) {
 	return &model.Book{ID: &tmp.ID,
 		Title: tmp.Title,
 		Author: &model.Person{
-			ID:   strconv.Itoa(tmp.PersonID),
+			ID:   tmp.PersonID,
 			Nama: tmp.Nama,
 			Hp:   &tmp.Hp,
 			Umur: tmp.Umur}}, nil

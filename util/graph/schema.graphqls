@@ -5,7 +5,7 @@ type Book{
 }
 
 type Person{
-  id: ID!
+  id: Int!
   nama: String!
   hp: String
   umur: Int!

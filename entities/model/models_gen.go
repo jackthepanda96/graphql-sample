@@ -21,7 +21,7 @@ type NewPerson struct {
 }
 
 type Person struct {
-	ID       string  `json:"id"`
+	ID       int     `json:"id"`
 	Nama     string  `json:"nama"`
 	Hp       *string `json:"hp"`
 	Umur     int     `json:"umur"`

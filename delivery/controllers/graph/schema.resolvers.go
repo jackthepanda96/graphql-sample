@@ -4,12 +4,13 @@ package graph
 // will be copied through when generating and any unknown code will be moved to the end.
 
 import (
+	"Project/research/sample-gql/delivery/middleware"
 	"Project/research/sample-gql/entities"
 	"Project/research/sample-gql/entities/model"
 	"Project/research/sample-gql/util/graph/generated"
 	"context"
 	"errors"
-	"strconv"
+	"fmt"
 )
 
 func (r *mutationResolver) AddPerson(ctx context.Context, input model.NewPerson) (*model.Person, error) {
@@ -19,7 +20,7 @@ func (r *mutationResolver) AddPerson(ctx context.Context, input model.NewPerson)
 		return nil, errors.New("not found")
 	}
 
-	return &model.Person{ID: strconv.Itoa(int(res.ID)), Nama: res.Nama, Hp: &res.HP, Umur: res.Umur}, nil
+	return &model.Person{ID: int(res.ID), Nama: res.Nama, Hp: &res.HP, Umur: res.Umur}, nil
 }
 
 func (r *mutationResolver) AddBook(ctx context.Context, input model.NewBook) (*model.Book, error) {
@@ -54,7 +55,9 @@ func (r *queryResolver) BooksByID(ctx context.Context, id int) (*model.Book, err
 }
 
 func (r *queryResolver) Persons(ctx context.Context) ([]*model.Person, error) {
-	// middleware.GetAuthFromContext(ctx)
+	tmp := middleware.GetAuthFromContext(ctx)
+	fmt.Println(ctx)
+	fmt.Println(tmp)
 
 	res, err := r.personRepo.Get()
 
@@ -63,7 +66,7 @@ func (r *queryResolver) Persons(ctx context.Context) ([]*model.Person, error) {
 	}
 	resArr := []*model.Person{}
 	for i := 0; i < len(res); i++ {
-		resArr = append(resArr, &model.Person{ID: strconv.Itoa(int(res[i].ID)), Nama: res[i].Nama, Umur: res[i].Umur, Hp: &res[i].HP})
+		resArr = append(resArr, &model.Person{ID: int(res[i].ID), Nama: res[i].Nama, Umur: res[i].Umur, Hp: &res[i].HP})
 	}
 
 	return resArr, err
