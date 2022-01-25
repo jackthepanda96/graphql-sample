@@ -24,14 +24,19 @@ func (r *mutationResolver) AddPerson(ctx context.Context, input model.NewPerson)
 }
 
 func (r *mutationResolver) AddBook(ctx context.Context, input model.NewBook) (*model.Book, error) {
-	res, err := r.bookRepo.Create(entities.Book{Title: input.Title, Author: uint(input.Author)})
-
+	res1, err := r.personRepo.Create(entities.Person{Nama: input.Author.Nama, Umur: input.Author.Umur, HP: *input.Author.Hp, Password: input.Author.Password})
 	if err != nil {
 		return nil, errors.New("not found")
 	}
+
+	res, err := r.bookRepo.Create(entities.Book{Title: input.Title, Author: uint(res1.ID)})
+	if err != nil {
+		return nil, errors.New("not found")
+	}
+
 	convID := int(res.ID)
 
-	return &model.Book{ID: &convID, Title: res.Title}, nil
+	return &model.Book{ID: &convID, Title: res.Title, Author: &model.Person{ID: int(res1.ID), Nama: res1.Nama, Hp: &res1.HP}}, nil
 }
 
 func (r *queryResolver) Books(ctx context.Context) ([]*model.Book, error) {

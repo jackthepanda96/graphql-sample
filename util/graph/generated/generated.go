@@ -293,7 +293,7 @@ input NewPerson{
 
 input NewBook{
   title: String!
-  author: Int!
+  author: NewPerson
 }
 
 type Mutation{
@@ -2115,7 +2115,7 @@ func (ec *executionContext) unmarshalInputNewBook(ctx context.Context, obj inter
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("author"))
-			it.Author, err = ec.unmarshalNInt2int(ctx, v)
+			it.Author, err = ec.unmarshalONewPerson2ᚖProjectᚋresearchᚋsampleᚑgqlᚋentitiesᚋmodelᚐNewPerson(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3085,6 +3085,14 @@ func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.Sele
 		return graphql.Null
 	}
 	return graphql.MarshalInt(*v)
+}
+
+func (ec *executionContext) unmarshalONewPerson2ᚖProjectᚋresearchᚋsampleᚑgqlᚋentitiesᚋmodelᚐNewPerson(ctx context.Context, v interface{}) (*model.NewPerson, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputNewPerson(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalOString2string(ctx context.Context, v interface{}) (string, error) {

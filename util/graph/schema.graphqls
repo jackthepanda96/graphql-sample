@@ -27,7 +27,7 @@ input NewPerson{
 
 input NewBook{
   title: String!
-  author: Int!
+  author: NewPerson
 }
 
 type Mutation{

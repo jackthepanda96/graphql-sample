@@ -9,8 +9,8 @@ type Book struct {
 }
 
 type NewBook struct {
-	Title  string `json:"title"`
-	Author int    `json:"author"`
+	Title  string     `json:"title"`
+	Author *NewPerson `json:"author"`
 }
 
 type NewPerson struct {
