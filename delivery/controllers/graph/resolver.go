@@ -15,13 +15,11 @@ import (
 // It serves as dependency injection for your app, add any dependencies you require here.
 
 type Resolver struct {
-	// db      *gorm.DB
 	bookRepo   book.Book
 	personRepo person.Person
 	tmpList    []*model.Person
-	// Observer map[string]chan []*model.Person
-	Observer map[string]chan *model.Person
-	mu       sync.Mutex
+	Observer   map[string]chan *model.Person
+	mu         sync.Mutex
 }
 
 func NewResolver(br book.Book, pr person.Person) *Resolver {
