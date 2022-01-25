@@ -5,7 +5,6 @@ import (
 	"Project/research/sample-gql/repository/book"
 	"Project/research/sample-gql/repository/person"
 	"context"
-	"sync"
 
 	"github.com/99designs/gqlgen/graphql"
 )
@@ -18,8 +17,6 @@ type Resolver struct {
 	bookRepo   book.Book
 	personRepo person.Person
 	tmpList    []*model.Person
-	Observer   map[string]chan *model.Person
-	mu         sync.Mutex
 }
 
 func NewResolver(br book.Book, pr person.Person) *Resolver {
@@ -27,8 +24,6 @@ func NewResolver(br book.Book, pr person.Person) *Resolver {
 		bookRepo:   br,
 		personRepo: pr,
 		tmpList:    []*model.Person{},
-		Observer:   map[string]chan *model.Person{},
-		mu:         sync.Mutex{},
 	}
 }
 
