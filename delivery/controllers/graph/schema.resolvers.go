@@ -24,9 +24,13 @@ func (r *mutationResolver) AddPerson(ctx context.Context, input model.NewPerson)
 }
 
 func (r *mutationResolver) AddBook(ctx context.Context, input model.NewBook) (*model.Book, error) {
-	res1, err := r.personRepo.Create(entities.Person{Nama: input.Author.Nama, Umur: input.Author.Umur, HP: *input.Author.Hp, Password: input.Author.Password})
-	if err != nil {
-		return nil, errors.New("not found")
+	var res1 entities.Person
+	var err error
+	if input.Author != nil {
+		res1, err = r.personRepo.Create(entities.Person{Nama: input.Author.Nama, Umur: input.Author.Umur, HP: *input.Author.Hp, Password: input.Author.Password})
+		if err != nil {
+			return nil, errors.New("not found")
+		}
 	}
 
 	res, err := r.bookRepo.Create(entities.Book{Title: input.Title, Author: uint(res1.ID)})
@@ -37,6 +41,10 @@ func (r *mutationResolver) AddBook(ctx context.Context, input model.NewBook) (*m
 	convID := int(res.ID)
 
 	return &model.Book{ID: &convID, Title: res.Title, Author: &model.Person{ID: int(res1.ID), Nama: res1.Nama, Hp: &res1.HP}}, nil
+}
+
+func (r *mutationResolver) BuatPerson(ctx context.Context, nama string, hp *string, umur *int, password string) (*model.Person, error) {
+	panic(fmt.Errorf("not implemented"))
 }
 
 func (r *queryResolver) Books(ctx context.Context) ([]*model.Book, error) {
@@ -60,9 +68,9 @@ func (r *queryResolver) BooksByID(ctx context.Context, id int) (*model.Book, err
 }
 
 func (r *queryResolver) Persons(ctx context.Context) ([]*model.Person, error) {
-	tmp := middleware.GetAuthFromContext(ctx)
-	fmt.Println(ctx)
-	fmt.Println(tmp)
+	raw := ctx.Value("EchoContextKey").(*middleware.User)
+	convRaw := *raw
+	fmt.Println(convRaw.Id)
 
 	res, err := r.personRepo.Get()
 

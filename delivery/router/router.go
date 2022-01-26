@@ -5,7 +5,7 @@ import (
 	"Project/research/sample-gql/delivery/controllers/book"
 	"Project/research/sample-gql/delivery/controllers/person"
 	custom "Project/research/sample-gql/delivery/middleware"
-	"fmt"
+	"context"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
@@ -14,7 +14,7 @@ import (
 )
 
 type User struct {
-	Id int
+	Id interface{}
 }
 
 type ContextKey struct {
@@ -34,9 +34,9 @@ func RegisterPath(e *echo.Echo, authController *auth.AuthController, personContr
 		e.Use(middleware.CORSWithConfig((middleware.CORSConfig{})))
 
 		e.POST("/query", func(c echo.Context) error {
-			fmt.Println(c.Get("ID"))
-			// tmpUser := &User{c.Get("ID").(int)}
-			// newReq := c.Request().WithContext(context.WithValue(c.Request().Context(), &ContextKey{"user"}, &tmpUser))
+			// tmp:= c.Get("INFO")
+			ctx := context.WithValue(c.Request().Context(), "EchoContextKey", c.Get("INFO"))
+			c.SetRequest(c.Request().WithContext(ctx))
 			srv.ServeHTTP(c.Response(), c.Request())
 			return nil
 		}, custom.JWTMiddleware())

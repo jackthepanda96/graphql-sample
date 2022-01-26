@@ -10,7 +10,8 @@ import (
 )
 
 type User struct {
-	Id int
+	Id   int
+	Role string
 }
 
 type ContextKey struct {
@@ -22,17 +23,10 @@ func JWTMiddleware() echo.MiddlewareFunc {
 		SigningMethod: "HS256",
 		SigningKey:    []byte("R4HASIA"),
 		Skipper: func(c echo.Context) bool {
-			// if c.Request().Header.Get("Authorization") == "" {
-			// 	return true
-			// }
-
 			return c.Request().Header.Get("Authorization") == ""
 		}, SuccessHandler: func(c echo.Context) {
-			tmpUser := User{ExtractToken(c)}
-			c.Set("ID", ExtractToken(c))
-			newReq := c.Request().WithContext(context.WithValue(c.Request().Context(), &ContextKey{"user"}, &tmpUser))
-			// // new := c.Request().WithContext(context.WithValue(c.Request().Context(), &tmpUser, ExtractToken(c)))
-			c.SetRequest(newReq)
+			c.Set("INFO", &User{ExtractToken(c), "admin"})
+			fmt.Println(c)
 		},
 	})
 }
@@ -42,15 +36,12 @@ func ExtractToken(e echo.Context) int {
 	if token != nil && token.Valid {
 		claims := token.Claims.(jwt.MapClaims)
 		id := claims["id"]
-		// fmt.Println(id)
 		switch id.(type) {
 		case float64:
 			return int(id.(float64))
 		default:
 			return id.(int)
 		}
-
-		// return int(id.(float64))
 	}
 	return -1 //invalid
 }
