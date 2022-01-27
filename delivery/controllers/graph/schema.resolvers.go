@@ -68,9 +68,13 @@ func (r *queryResolver) BooksByID(ctx context.Context, id int) (*model.Book, err
 }
 
 func (r *queryResolver) Persons(ctx context.Context) ([]*model.Person, error) {
-	raw := ctx.Value("EchoContextKey").(*middleware.User)
-	convRaw := *raw
-	fmt.Println(convRaw.Id)
+	raw := ctx.Value("EchoContextKey")
+	if raw != nil {
+		convRaw := *raw.(*middleware.User)
+		if convRaw.Role != "admin" {
+			return nil, errors.New("not allowed")
+		}
+	}
 
 	res, err := r.personRepo.Get()
 
